@@ -1,0 +1,14 @@
+<li>
+    <h1> <%- post.message %></h1>
+
+    <ul>
+        <% post.comments.forEach(comment => { %>
+            <% if (comment) { %>
+                <li><%- comment %></li>
+            <% } %> 
+        <% }); %> 
+    </ul>
+    <input type="hidden" value="<%- post.post_id %>">
+    <textarea name="message" id="" cols="30" rows="1.5" placeholder="Comment something.."></textarea>
+    <button class="comment-button">Add comment</button>
+</li>
