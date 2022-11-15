@@ -1,0 +1,17 @@
+<li>
+    <button class="delete-post-button">DELETE POST</button>
+    <input type="hidden" value="<%- post.post_id %>">
+    <h1><%- post.message %></h1>
+    <div>
+        <ul id="comments-container">
+            <% post.comments.forEach(comment => {%> 
+                <% if(comment){ %>
+                    <li><%- comment %></li>
+                <% } %>  
+            <% }) %> 
+        </ul>
+        <textarea cols="30" rows="10" placeholder="Say Something"></textarea>
+        <input type="hidden" value="<%- post.post_id %>" />
+        <button class="comment-button">Add comment</button>
+    </div>
+</li>

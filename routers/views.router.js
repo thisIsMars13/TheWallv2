@@ -1,19 +1,36 @@
 const express = require('express');
 const ViewsRouter = express.Router();
-const ViewsController = require('../controllers/views.controllers');
+const WallsController = require('../controllers/walls.controllers');
 
-let viewsController = new ViewsController();
+const wallsController = new WallsController();
 
 ViewsRouter.get('/login', (req, res) => {
-    res.render('login');
+    if(req.session.general){
+        res.redirect('/wall');
+    }
+    else{
+        res.render('login');
+    }
 });
 
 ViewsRouter.get('/register', (req, res) => {
-    res.render('registration');
+    if(req.session.general){
+        res.redirect('/wall');
+    }
+    else{
+        res.render('registration');
+    }
 });
 
 ViewsRouter.get('/', (req, res) => {
-    res.render('login');
+    if(req.session.general){
+        res.redirect('/wall');
+    }
+    else{
+        res.render('login');
+    }
 });
+
+ViewsRouter.get('/wall', wallsController.renderWall);
 
 module.exports = ViewsRouter;
