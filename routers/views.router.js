@@ -1,8 +1,8 @@
 const express = require('express');
 const ViewsRouter = express.Router();
-const WallsController = require('../controllers/walls.controllers');
+const WallsController = require('../controllers/walls.controllers')
 
-const wallsController = new WallsController();
+let wallsController = new WallsController();
 
 ViewsRouter.get('/login', (req, res) => {
     if(req.session.general){

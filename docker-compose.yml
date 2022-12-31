@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - $HOME/database:/var/lib/mysql
+    expose:
+      - 3306
+    ports:
+      - "3306:3306"
+    networks:
+      - internalnet
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql-docker
+      MYSQL_DATABASE: thewallv2
+      MYSQL_ALLOW_EMPTY_PASSWORD: ok
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_HOST: '%'
+  node-app:
+    depends_on:
+      - mysql
+    build: .
+    command: bash -c 'while !</dev/tcp/mysql_container/3306; do sleep 1; done; npm run dev'
+    volumes:
+      - ./:/app:ro
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    networks:
+      - internalnet
+
+networks:
+  internalnet:
+    driver: bridge

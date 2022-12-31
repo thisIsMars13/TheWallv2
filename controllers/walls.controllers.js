@@ -1,6 +1,5 @@
-const { JSONCookie } = require('cookie-parser');
 const GlobalHelper = require('../helpers/global.helper');
-const WallsModel = require('../models/walls.model');
+const WallsModel =  require('../models/walls.model');
 
 class WallsController{
     constructor(){
@@ -8,8 +7,8 @@ class WallsController{
     }
 
     /** 
-    * Function that handles login request from FE
-    * Last updated November 1, 2022
+    * Function that handle the fetching of posts data on the initial load of walls page
+    * Last updated December 31, 2022
     * @author Jomar
     */
     renderWall = async (req, res) => {
@@ -19,22 +18,32 @@ class WallsController{
             if(req.session.general){
                 let { user_id } = req.session.general;
 
-                let wallsModel = new WallsModel();
-                let { status, result, error } = await wallsModel.fetchPosts({ user_id });
+                if(user_id){
+                    let wallsModel = new WallsModel();
+                    let { status, result, error } = await wallsModel.fetchPosts({user_id});
 
-                if(status){
-                    response_data.posts_contents = result[0]?.post_contents ? JSON.parse(result[0].post_contents) : [];
-                    response_data.status = true;
+                    if(status){
+                        response_data.status = true;
+                        response_data.post_contents = result[0]?.post_contents ? JSON.parse(result[0].post_contents) : [];
+                    }
+                    else{
+                        response_data.error = error;
+                    }
+                }
+                else{
+                    response_data.error = 'Incomplete parameters to complete the fetching of post'
                 }
             }
             else{
-                response_data.redirect = '/login';
+                response_data.redirect = '/login'
             }
         } 
         catch (error) {
-            console.log(error);    
+            console.log(error);
+            response_data.error = error;    
         }
 
+        /* Check if the user needs to be redirected */
         if(response_data.redirect){
             res.redirect(response_data.redirect);
         }
@@ -44,8 +53,8 @@ class WallsController{
     }
 
     /** 
-    * Function that handles login request from FE
-    * Last updated November 1, 2022
+    * Function that handle the creation of posts
+    * Last updated December 31, 2022
     * @author Jomar
     */
     createPost = async (req, res) => {
@@ -56,14 +65,14 @@ class WallsController{
                 let { user_id } = req.session.general;
 
                 let globalHelper = new GlobalHelper();
-                /* Filter parameters from FE, only use keys needed in login process */
+                /* Filter parameters from FE, only use keys needed in registration  process */
                 let { status: sanitation_status, result: sanitation_result, error } = globalHelper.sanitizeParams(["post_message"], [], req);
 
                 if(sanitation_status){
                     let wallsModel = new WallsModel();
-                    let { status, result, error} = await wallsModel.createPost({ user_id, ...sanitation_result });
+                    let { status, result, error } = await wallsModel.createPost({user_id, ...sanitation_result });
 
-                    if(status && result.affectedRows ){
+                    if(status && result.affectedRows){
                         response_data.status = true;
                         response_data.insert_id = result.insertId;
                     }
@@ -76,13 +85,15 @@ class WallsController{
                 }
             }
             else{
-                response_data.redirect = '/login';
+                response_data.redirect = '/login'
             }
         } 
         catch (error) {
-            console.log(error);    
+            console.log(error);
+            response_data.error = error;    
         }
 
+        /* Check if the user needs to be redirected */
         if(response_data.redirect){
             res.redirect(response_data.redirect);
         }
@@ -92,8 +103,8 @@ class WallsController{
     }
 
     /** 
-    * Function that handles creation of comments
-    * Last updated November 1, 2022
+    * Function that handle the creation of comments
+    * Last updated December 31, 2022
     * @author Jomar
     */
     createComment = async (req, res) => {
@@ -104,15 +115,16 @@ class WallsController{
                 let { user_id } = req.session.general;
 
                 let globalHelper = new GlobalHelper();
-                /* Filter parameters from FE, only use keys needed in login process */
+                /* Filter parameters from FE, only use keys needed in registration  process */
                 let { status: sanitation_status, result: sanitation_result, error } = globalHelper.sanitizeParams(["comment_message", "post_id"], [], req);
 
                 if(sanitation_status){
                     let wallsModel = new WallsModel();
-                    let { status, result, error} = await wallsModel.createComments({ user_id, ...sanitation_result });
+                    let { status, result, error } = await wallsModel.createComment({user_id, ...sanitation_result });
 
-                    if(status && result.affectedRows ){
+                    if(status){
                         response_data.status = true;
+                        response_data.result = result;
                     }
                     else{
                         response_data.error = error;
@@ -123,13 +135,15 @@ class WallsController{
                 }
             }
             else{
-                response_data.redirect = '/login';
+                response_data.redirect = '/login'
             }
         } 
         catch (error) {
-            console.log(error);    
+            console.log(error);
+            response_data.error = error;    
         }
 
+        /* Check if the user needs to be redirected */
         if(response_data.redirect){
             res.redirect(response_data.redirect);
         }
@@ -139,11 +153,11 @@ class WallsController{
     }
 
     /** 
-    * Function that handles the deletion of posts
-    * Last updated November 1, 2022
+    * Function that handle the deletion of posts
+    * Last updated December 31, 2022
     * @author Jomar
     */
-    deletePosts = async (req, res) => {
+    deletePost = async (req, res) => {
         let response_data = { status: false, result: null, error: null}
 
         try {
@@ -151,25 +165,35 @@ class WallsController{
                 let { user_id } = req.session.general;
 
                 let globalHelper = new GlobalHelper();
-                /* Filter parameters from FE, only use keys needed in login process */
+                /* Filter parameters from FE, only use keys needed in registration  process */
                 let { status: sanitation_status, result: sanitation_result, error } = globalHelper.sanitizeParams(["post_id"], [], req);
 
                 if(sanitation_status){
                     let wallsModel = new WallsModel();
-                    response_data = await wallsModel.deletePosts({ user_id, ...sanitation_result });
+                    let { status, result, error } = await wallsModel.deletePost({user_id, ...sanitation_result });
+
+                    if(status){
+                        response_data.status = true;
+                        response_data.result = result;
+                    }
+                    else{
+                        response_data.error = error;
+                    }
                 }
                 else{
                     response_data.error = error;
                 }
             }
             else{
-                response_data.redirect = '/login';
+                response_data.redirect = '/login'
             }
         } 
         catch (error) {
-            console.log(error);    
+            console.log(error);
+            response_data.error = error;    
         }
 
+        /* Check if the user needs to be redirected */
         if(response_data.redirect){
             res.redirect(response_data.redirect);
         }

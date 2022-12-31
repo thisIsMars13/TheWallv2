@@ -1,6 +1,6 @@
 let ViewsRouter = require('./views.router');
 let UsersRouter = require('./users.router');
-let WallsRouter = require('./walls.router')
+let WallsRouter = require('../routers/walls.router')
 
 let AppRoutes = (app) => {
     app.use('/', ViewsRouter);

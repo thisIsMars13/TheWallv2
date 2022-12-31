@@ -105,7 +105,7 @@ class UsersModel extends DatabaseModel{
 
             }
             else{
-                response_data.error = "Missing parameters to complete login process"
+                response_data.error = "Missing parameters to complete login process";
             }
         } 
         catch (error) {

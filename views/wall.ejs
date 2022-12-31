@@ -1,13 +1,13 @@
 <form method="post" id="post-form">
     <h1>Say something</h1>
-    <textarea name="post_message" id="post-message" cols="30" rows="10"></textarea>
+    <textarea name="post_message" id="" cols="30" rows="10"></textarea>
     <button>Create Post</button>
 </form>
 
 <div>
     <ul id="posts-container">
-        <% posts_contents.map(post => { %> 
-            <%- include('posts', {post}) %> 
+        <% post_contents.map(post => { %> 
+                <%- include('posts', { post }) %> 
         <% }) %> 
     </ul>
 </div>
